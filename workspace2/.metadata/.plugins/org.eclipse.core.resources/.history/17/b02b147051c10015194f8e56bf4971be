@@ -1,0 +1,63 @@
+import java.net.*;
+import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.DataInputStream;
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.util.Scanner;
+
+
+public class server
+{
+	public static void main(String[] args)
+	{
+		//int port =Integer.parseInt(args[0]);
+		try
+		{
+			//try to establish a server socket first
+			ServerSocket server_socket = new ServerSocket(1234);
+			System.out.println("Waiting for client on port "+ server_socket.getLocalPort()+"...");
+			Socket server = server_socket.accept();
+			System.out.println("Just connected to "+ server.getRemoteSocketAddress());
+			DataOutputStream out = new DataOutputStream (server.getOutputStream());
+			DataInputStream in = new DataInputStream(server.getInputStream());
+			out.writeBytes("You just connected to server at port 1234!\n");
+			String requestedfile;
+
+			//do
+			//{
+			requestedfile = in.readLine();
+			File file = new File(requestedfile);
+			if(file.isFile())
+			{
+				java.io.FileInputStream fin = new FileInputStream(file);
+				byte[] buff = new byte[32];
+				while(fin.read(buff) != -1)
+				{
+					out.write(buff,0,buff.length);
+				}
+			}
+			else{
+				System.out.println("The requested file not found\n");
+				out.writeByte("450: File not found\r\n");
+			}
+			
+			
+				
+			//}
+			//while(!from_client.equals("quit"));
+			System.out.println("The connection to: "+ server.getRemoteSocketAddress()+" has terminated");
+			server.close();
+			out.close();
+			in.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+
+}

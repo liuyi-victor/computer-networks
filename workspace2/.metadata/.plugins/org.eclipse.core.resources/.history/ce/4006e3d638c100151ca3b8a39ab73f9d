@@ -1,0 +1,92 @@
+import java.io.*;
+import java.net.*;
+import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.File;
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.util.Scanner;
+
+/*
+ * server socket establish
+ * server's socket waiting for connections from the client
+ * after accepting a connection and successfully connected, the server sends a response message to the client
+ * the server then expects to receive from the client the name of the file to be requested
+ * server checks whether the file exists
+ * if(file == exist)
+ * {
+ * 		tell the client that the transmission is about to begin;
+ * 		
+ * 
+ * else
+ * 		send the error message to the client;
+ */
+
+public class server
+{
+	public static void main(String[] args)
+	{
+		//file object is like a java user interface to the file/directory? 
+		//int port =Integer.parseInt(args[0]);
+		try
+		{
+			//try to establish a server socket first
+			ServerSocket server_socket = new ServerSocket(1234);
+			System.out.println("Waiting for client on port "+ server_socket.getLocalPort()+"...");
+			Socket server = server_socket.accept();													//waiting for the client connection
+			System.out.println("Just connected to "+ server.getRemoteSocketAddress());
+			DataOutputStream out = new DataOutputStream (server.getOutputStream());
+			DataInputStream in = new DataInputStream(server.getInputStream());
+			out.writeBytes("You just connected to the FTP server at port 1234! Please enter the name of the file\n");
+			String requestedfile;
+			
+			//System.out.println(in.readUTF());
+		//	do
+		//	{
+			
+			
+				requestedfile = in.readLine();
+				System.out.println("The client has requested file: "+ requestedfile);
+				File thefile=new File(requestedfile);
+				if(thefile.isFile())
+				{
+					out.writeBytes("105: File status okay\r\n");
+					java.io.FileInputStream fin = new FileInputStream(thefile);
+					byte[] buffer= new byte[32];
+					while(fin.read(buffer) != -1)
+					{
+						out.write(buffer);
+					}
+					System.out.println("Finished with transfer of file: "+requestedfile);
+				}
+				else{
+					System.out.println("The file requested does not exist\n");
+					out.writeBytes("405: File not found\r\n");
+				}
+				
+				//out.writeBytes(from_client + "\r\n");			//echo back what the client had send to the server
+				
+				
+				
+				
+			//}
+		//	while(!from_client.equals("quit"));
+			System.out.println("The connection to: "+ server.getRemoteSocketAddress()+" has terminated");
+			//out.writeBytes("goodbye\n");
+			out.close();
+			in.close();
+			server.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+
+}

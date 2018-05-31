@@ -1,0 +1,90 @@
+import java.net.*;
+import java.util.Scanner;
+import java.io.*;
+import java.io.File;
+
+/*(1) the client trys to connect to the server
+ *(2) client requests a file from the server by specifying the file's name(by typing on the keyboard)
+ *after successful connection
+ *user types file name (System.in)
+ *DataInputStream from_server = new DataInputStream (client.getInputStream());
+ *DataOutputStream to_server = new DataOutputStream (client.getOutputStream());
+ *send the file name to server through socket;
+ *if(respond message from server != error)
+ *{
+ *	File req_file=new File(filename);		//create new file
+ *	java.io.FileOutputStream fout = new FileOutputStream(File file);
+ *	while()
+ *	{
+ *		receive the file in chunks;
+ *		fout
+ *	}
+ *}
+ *else
+ *	print error message (System.out);
+ *socket.close();
+ **/
+
+public class client {
+
+	public static void main(String[] args){
+	
+		String servername = args[0];					//obtain the server name from argument 0
+		int serverport = Integer.parseInt(args[1]);		//obtain server's port from argument 1
+		String filename = null;
+		
+		try{
+			System.out.println("Trying connecting to "+ servername+" on port "+ serverport);	
+			Scanner src = new Scanner(System.in);
+			Socket client=new Socket (servername, serverport);											//trys to connect with the new socket
+			BufferedReader reader=new BufferedReader(new InputStreamReader(client.getInputStream()));	//get the server's response from the socket's input stream
+			String msg= reader.readLine();
+			System.out.println("After successful connection, server's message: "+msg);					//print out server's response message
+			
+			DataOutputStream to_server = new DataOutputStream (client.getOutputStream());				//client socket stream for sending data over to server side
+			//long sent_time, respond_time,trip_time; 
+			
+			System.out.println("Enter the name of the requested file: ");
+			filename = src.nextLine();																	//get the user input from keyboard
+			//sent_time = System.currentTimeMillis();
+			to_server.writeBytes(filename +"\r\n");														//send the user message to the server
+			msg = reader.readLine();
+			reader.close();
+			DataInputStream from_server=new DataInputStream (client.getInputStream());					//client socket stream for reading the data sent from server
+			
+			
+			if(msg != error)
+			{
+				File req_file = new File(filename);														//create new file 
+				java.io.FileOutputStream fout = new FileOutputStream(filename);
+				while()
+				{
+					receive the file in chunks;
+					fout
+				}
+			}
+			else{
+				System.out.println("The requested file isn't found on server's file system.\n");
+			}
+				
+			//respond_time = System.currentTimeMillis();																		//System.out.println("you just entered: "+client_msg);
+			//trip_time = respond_time-sent_time;
+			/*
+			System.out.println("The server said: "+msg);
+			System.out.println("The network round trip time is : "+ trip_time);*/
+			
+			System.out.println("Closing the connection");							
+			client.close();
+			//reader.close();
+			from_server.close();
+			to_server.close();
+			
+		}
+		catch(IOException e)
+		{
+			e.getStackTrace();
+			e.printStackTrace();
+		}
+		
+	}
+}

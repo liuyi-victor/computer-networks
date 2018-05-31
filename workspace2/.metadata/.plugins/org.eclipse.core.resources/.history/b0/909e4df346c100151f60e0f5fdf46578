@@ -1,0 +1,47 @@
+import java.io.BufferedReader;
+import java.net.*;
+import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.DataInputStream;
+import java.net.Socket;
+import java.net.ServerSocket;
+import java.util.Scanner;
+
+
+public class server
+{
+	public static void main(String[] args)
+	{
+		//int port =Integer.parseInt(args[0]);
+		try
+		{
+			//try to establish a server socket first
+			ServerSocket server_socket = new ServerSocket(1234);
+			System.out.println("Waiting for client on port "+ server_socket.getLocalPort()+"...");
+			Socket server = server_socket.accept();
+			System.out.println("Just connected to "+ server.getRemoteSocketAddress());
+			DataOutputStream out = new DataOutputStream (server.getOutputStream());					//sending the server message and the file over to the client
+			DataInputStream in = new DataInputStream(server.getInputStream());						//reading the name of requested file from the client
+			out.writeBytes("You just connected to server at port 1234!\n");
+			//String from_client;
+			//do
+			//{
+			
+				
+			//}
+			//while(!from_client.equals("quit"));
+			System.out.println("The connection to: "+ server.getRemoteSocketAddress()+" has terminated");
+			out.writeBytes("goodbye\n");
+			server.close();
+			out.close();
+			in.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+
+}
